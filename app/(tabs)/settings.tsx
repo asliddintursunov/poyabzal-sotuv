@@ -1,39 +1,22 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View, Dimensions } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 
 export default function SettingsScreen() {
+  const route = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const access_token = "SOME_RANDOM_TOKEN_VALUE";
-  const saveToken = async (token: string) => {
-    try {
-      await AsyncStorage.setItem("access_token", token);
-      console.log("Token saved");
-    } catch (error) {
-      console.log("Failed to save the token to storage", error);
-    }
-  };
-
-  const getToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("access_token");
-      console.log("Token got");
-      console.log(token);
-    } catch (error) {
-      console.log("Failed to fetch the token from storage", error);
-    }
-  };
-
-  const removeToken = async () => {
+  const logout = async () => {
     try {
       await AsyncStorage.removeItem("access_token");
-      console.log("Token removed");
+
+      route.push("(auth)/");
     } catch (error) {
-      console.log("Failed to remove the token from storage", error);
+      console.error("Failed to remove the token from storage", error);
     }
   };
 
@@ -78,15 +61,14 @@ export default function SettingsScreen() {
       <Button mode="contained-tonal" style={styles.buttonStyle}>
         O'zgarishlarni saqlash
       </Button>
-
-      <Button mode="outlined" onPress={() => saveToken(access_token)}>
-        Save
-      </Button>
-      <Button mode="outlined" onPress={getToken}>
-        Get
-      </Button>
-      <Button mode="outlined" onPress={removeToken}>
-        Remove
+      <Button
+        mode="contained-tonal"
+        buttonColor="#cf3c5a"
+        textColor="#fff"
+        style={styles.buttonStyle}
+        onPress={() => logout()}
+      >
+        Xisobdan chiqish
       </Button>
     </View>
   );
