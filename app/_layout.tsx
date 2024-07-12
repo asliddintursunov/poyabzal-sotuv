@@ -14,20 +14,9 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+  const [authed, setAuthed] = useState<boolean>(false);
   const pathname = usePathname();
-  const route = useRouter();
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  const [authed, setAuthed] = useState(false);
+  const router = useRouter();
 
   const getToken = async () => {
     try {
@@ -40,19 +29,37 @@ export default function RootLayout() {
 
   useEffect(() => {
     (async () => {
-      const token = await getToken();
-      console.log("pathname:::", pathname);
-      if (token) {
-        setAuthed(true);
-      } else {
-        if (pathname == "/login" || pathname == "/register") {
-          return;
+      try {
+        const token = await getToken();
+        // console.log("pathname:::", pathname);
+        // console.log("token:::", token);
+
+        if (token === null) {
+          setAuthed(false);
+          if (pathname !== "/login" && pathname !== "/register") {
+            router.push("/login");
+          }
+        } else {
+          setAuthed(true);
+          if (pathname === "/login" || pathname === "/register") {
+            router.push("/");
+          }
         }
-        route.push("(auth)/");
-        setAuthed(false);
+      } catch (error) {
+        console.error("Error checking auth status:", error);
       }
     })();
   }, [pathname]);
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
+  }
 
   return (
     <PaperProvider>

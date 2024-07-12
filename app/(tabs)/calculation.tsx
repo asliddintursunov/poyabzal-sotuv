@@ -1,7 +1,7 @@
+import { baseUrl } from "@/utils";
 import { useState } from "react";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
 import { Card, Button } from "react-native-paper";
-
 import {
   DatePickerInput,
   registerTranslation,
@@ -184,8 +184,31 @@ const last20Products: ProductType[] = [
 export default function CalculationScreen() {
   const [date, setDate] = useState(new Date());
 
-  const handleChange = (e: any) => {
-    setDate(e);
+  const handleChange = async (date: any) => {
+    try {
+      const formatted_date = date.toLocaleDateString("en-US")
+      const request = await fetch(
+        `${baseUrl}/get-products?date=${formatted_date}`,
+        {
+          method: "GET",
+        }
+      );      
+
+      if(request.status !== 200){
+        console.error("Error status code on fetching date", request.status);
+      }
+
+      const response = await request.json()
+      console.log("response:::", response);
+      
+
+    } catch (error) {
+      console.error("Error fetching date:", error);
+    }
+    console.log("date:::", date);
+    console.log("formatted date:::", date.toLocaleDateString("en-US"));
+    
+    setDate(date);
   };
 
   return (

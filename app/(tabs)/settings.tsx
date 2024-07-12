@@ -14,7 +14,7 @@ export default function SettingsScreen() {
     try {
       await AsyncStorage.removeItem("access_token");
 
-      route.push("(auth)/");
+      route.push("/login");
     } catch (error) {
       console.error("Failed to remove the token from storage", error);
     }
