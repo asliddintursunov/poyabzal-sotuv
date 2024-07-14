@@ -1,17 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import Inputs from "@/components/inputs/authInput";
 import { Button } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-
+import { baseUrl } from "@/utils";
+import Toast from "react-native-toast-message";
 export default function RegisterScreen() {
   const route = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const register = () => {
-    route.push("(auth)/");
+  const register = async () => {
+    if (username && password) {
+      try {
+        const request = await fetch(`${baseUrl}/auth/register`, {
+          method: "POST",
+          body: JSON.stringify({
+            username: username,
+            password: password,
+          }),
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        });
+
+        const response = await request.json();
+        if (!response.success) {
+          Toast.show({
+            type: "error",
+            text1: response.message,
+            text2: "Boshqa nom tanlang",
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+        } else {
+          Toast.show({
+            type: "success",
+            text1: response.message,
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+          setTimeout(() => {
+            route.push("/login");
+          }, 2000);
+        }
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Xatolik",
+          text2: "Qaytadan urunib ko'ring",
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      }
+    }
   };
 
   return (
@@ -21,6 +65,9 @@ export default function RegisterScreen() {
         colors={["lightblue", "#3b5998", "#192f6a"]}
         end={{ x: 0.25, y: 0.25 }}
       >
+        <View style={styles.toastStyle}>
+          <Toast />
+        </View>
         <Inputs
           username={username}
           password={password}
@@ -52,5 +99,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 100,
     width: Dimensions.get("screen").width - 12,
+  },
+  toastStyle: {
+    marginTop: -150,
+    paddingBottom: 150,
   },
 });
