@@ -31,9 +31,6 @@ export default function RootLayout() {
     (async () => {
       try {
         const token = await getToken();
-        console.log("pathname:::", pathname);
-        console.log("token:::", token);
-
         if (token === null) {
           setAuthed(false);
           if (pathname !== "/login" && pathname !== "/register") {
