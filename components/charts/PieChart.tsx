@@ -1,31 +1,27 @@
 import { PieChart } from "react-native-chart-kit";
-import { Dimensions, View, Text } from "react-native";
+import { Dimensions, View } from "react-native";
 import { chartConfig } from "./ChartConfig";
 
-export default function PieChartGraph() {
+type Params = {
+  currMonthStats: {
+    foyda: number;
+    savdo: number;
+  };
+};
+
+export default function PieChartGraph({ currMonthStats }: Params) {
   const config = chartConfig();
-  const savdo = 30000000;
-  const foyda = 10000000;
-  const chiqim = 3000000;
-  const soft_foyda = foyda - chiqim;
   const data = [
     {
       name: "Foyda",
-      money: foyda,
+      money: currMonthStats.foyda ?? 0,
       color: "#0063ff",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15,
     },
     {
-      name: "Chiqim",
-      money: chiqim,
-      color: "#F320DB",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15,
-    },
-    {
-      name: "Sof foyda",
-      money: soft_foyda,
+      name: "Savdo",
+      money: currMonthStats.savdo ?? 0,
       color: "#ffa726",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15,
@@ -33,13 +29,7 @@ export default function PieChartGraph() {
   ];
   return (
     <View>
-      <Text style={{ fontSize: 26 }}>
-        {new Intl.NumberFormat("en-US", {
-          style: "decimal",
-          useGrouping: true,
-        }).format(savdo)}{" "}
-        savdo
-      </Text>
+      {/* <Text style={{ fontSize: 26 }}>{savdo} savdo</Text> */}
       <PieChart
         data={data}
         width={Dimensions.get("window").width - 10}

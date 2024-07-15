@@ -1,3 +1,4 @@
+import Loader from "@/components/loader/Loader";
 import { baseUrl } from "@/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
@@ -11,51 +12,66 @@ export default function AddScreen() {
   const [shoeColor, setShoeColor] = useState("");
   const [shoeSoldPrice, setShoeSoldPrice] = useState("");
   const [shoeGetPrice, setShoeGetPrice] = useState("");
+  const [isPending, setIsPending] = useState(false);
 
   const handleSell = async () => {
-    
-    const access_token = await AsyncStorage.getItem("access_token");
-    const request = await fetch(`${baseUrl}/add-product`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: shoeName,
-        size: shoeSize,
-        color: shoeColor,
-        sold_price: shoeSoldPrice,
-        get_price: shoeGetPrice,
-      }),
-    });
-    
-    if (!request.ok) {
+    setIsPending(true);
+    try {
+      const access_token = await AsyncStorage.getItem("access_token");
+      const request = await fetch(`${baseUrl}/add-product`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: shoeName,
+          size: shoeSize,
+          color: shoeColor,
+          sold_price: shoeSoldPrice,
+          get_price: shoeGetPrice,
+        }),
+      });
+
+      if (!request.ok) {
+        setIsPending(false);
+        Toast.show({
+          type: "error",
+          text1: "Yangi poyabzal qo'shishda xatolik",
+          text2: "Qaytadan urunib ko'ring",
+          position: "top",
+          topOffset: 10,
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+        return;
+      }
+
+      const response = await request.json();
+      setIsPending(false);
       Toast.show({
-        type: "error",
-        text1: "Yangi poyabzal qo'shishda xatolik",
+        type: "success",
+        text1: response.message,
+        position: "top",
+        topOffset: 10,
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+    } catch (error) {
+      setIsPending(false);
+      Toast.show({
+        type: "success",
+        text1: "Poyabzal qo'shishda xatolik",
         text2: "Qaytadan urunib ko'ring",
         position: "top",
         topOffset: 10,
         visibilityTime: 3000,
         autoHide: true,
       });
-      return;
     }
-    
-    const response = await request.json();
-    
-    Toast.show({
-      type: "success",
-      text1: response.message,
-      position: "top",
-      topOffset: 10,
-      visibilityTime: 3000,
-      autoHide: true,
-    });
   };
-  
+
   const cancleSell = () => {
     setShoeName("");
     setShoeSize("");
@@ -66,6 +82,7 @@ export default function AddScreen() {
 
   return (
     <>
+      {isPending && <Loader />}
       <View style={styles.toastStyle}>
         <Toast />
       </View>

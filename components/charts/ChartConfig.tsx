@@ -7,7 +7,7 @@ export const chartConfig = () => {
       color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       style: {
-        borderRadius: 16,
+        borderRadius: 8,
       },
       propsForDots: {
         r: "6",
