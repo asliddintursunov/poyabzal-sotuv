@@ -1,9 +1,8 @@
 import LineChartGraph from "@/components/charts/LineChart";
 import PieChartGraph from "@/components/charts/PieChart";
-import Loader from "@/components/loader/Loader";
 import Toast from "react-native-toast-message";
 import { baseUrl } from "@/utils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getToken } from "@/helpers/tokenHelper";
 import { usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Dimensions } from "react-native";
@@ -46,7 +45,7 @@ export default function HomeScreen() {
         const formattedNextMonth = `${
           nextMonthDate.toLocaleDateString().split("/")[2]
         }-${nextMonthDate.toLocaleDateString().split("/")[0]}`;
-        const access_token = await AsyncStorage.getItem("access_token");
+        const access_token = await getToken();
         if (!access_token) {
           router.push("/login");
           return;

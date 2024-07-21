@@ -28,6 +28,14 @@ export default function Inputs({
         label="Foydalanuvchi ismi"
         value={username}
         onChangeText={(text) => setUsername(text)}
+        right={
+          <TextInput.Affix
+            text={`${username.length}/20`}
+            textStyle={{
+              color: username.length > 20 ? "red" : "gray",
+            }}
+          />
+        }
       />
       <TextInput
         mode="outlined"

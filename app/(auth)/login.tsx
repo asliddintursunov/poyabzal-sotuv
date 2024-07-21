@@ -8,6 +8,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { baseUrl } from "@/utils";
 import Toast from "react-native-toast-message";
 import Loader from "@/components/loader/Loader";
+import { setToken } from "@/helpers/tokenHelper";
 
 export default function AuthHomeScreen() {
   const route = useRouter();
@@ -32,8 +33,6 @@ export default function AuthHomeScreen() {
         });
 
         const response = await request.json();
-        console.log(response);
-
         if (!response.success) {
           setIsPending(false);
           Toast.show({
@@ -51,10 +50,10 @@ export default function AuthHomeScreen() {
             visibilityTime: 2000,
             autoHide: true,
           });
-          await AsyncStorage.setItem(
-            "access_token",
-            response.tokens.access_token
-          );
+
+          const token = response.tokens.access_token;
+          setToken(token);
+
           setTimeout(() => {
             route.push("/");
           }, 2000);

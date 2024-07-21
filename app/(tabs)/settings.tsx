@@ -1,4 +1,5 @@
 import Loader from "@/components/loader/Loader";
+import { getToken } from "@/helpers/tokenHelper";
 import { baseUrl } from "@/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -22,7 +23,7 @@ export default function SettingsScreen() {
     (async () => {
       try {
         setIsPending(true);
-        const access_token = await AsyncStorage.getItem("access_token");
+        const access_token = await getToken();
         if (!access_token) {
           route.push("/login");
           return;
@@ -67,9 +68,21 @@ export default function SettingsScreen() {
   };
 
   const updateProfile = async () => {
+    if (!(username && oldPassword && newPassword)) {
+      Toast.show({
+        type: "error",
+        text1: "Qiymat xatoligi",
+        text2: "Barcha qiymatlar to'dirilmagunicha profilni yangilay olmaysiz!",
+        position: "top",
+        topOffset: 0,
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+      return;
+    }
     try {
       setIsPending(true);
-      const access_token = await AsyncStorage.getItem("access_token");
+      const access_token = await getToken();
       if (!access_token) {
         route.push("/login");
         return;
@@ -137,7 +150,8 @@ export default function SettingsScreen() {
 
   return (
     <>
-      <Text style={styles.usernameStyle}>{initialData.username}</Text>
+      {/* <Text style={styles.usernameStyle}>{initialData.username}</Text> */}
+      <Text style={styles.usernameStyle}>Foydalanuvchi ismi</Text>
       {isPending && <Loader />}
       <View style={styles.toastStyle}>
         <Toast />
@@ -153,7 +167,14 @@ export default function SettingsScreen() {
           label="Foydalanuvchi ismi"
           value={username}
           onChangeText={(text) => setUsername(text)}
-          right={<TextInput.Affix text={`${username.length}/20`} />}
+          right={
+            <TextInput.Affix
+              text={`${username.length}/20`}
+              textStyle={{
+                color: username.length > 20 ? "red" : "gray",
+              }}
+            />
+          }
         />
         <TextInput
           mode="outlined"
@@ -165,7 +186,14 @@ export default function SettingsScreen() {
           label="Eski parol"
           value={oldPassword}
           onChangeText={(text) => setOldPassword(text)}
-          right={<TextInput.Affix text={`${oldPassword.length}/20`} />}
+          right={
+            <TextInput.Affix
+              text={`${oldPassword.length}/20`}
+              textStyle={{
+                color: oldPassword.length > 20 ? "red" : "gray",
+              }}
+            />
+          }
         />
         <TextInput
           mode="outlined"
@@ -177,11 +205,23 @@ export default function SettingsScreen() {
           label="Yangi parol"
           value={newPassword}
           onChangeText={(text) => setNewPassword(text)}
-          right={<TextInput.Affix text={`${newPassword.length}/20`} />}
+          right={
+            <TextInput.Affix
+              text={`${newPassword.length}/20`}
+              textStyle={{
+                color: newPassword.length > 20 ? "red" : "gray",
+              }}
+            />
+          }
         />
         <Button
           mode="contained-tonal"
           style={styles.buttonStyle}
+          disabled={
+            username.length > 20 ||
+            newPassword.length > 20 ||
+            oldPassword.length > 20
+          }
           onPress={() => updateProfile()}
         >
           O'zgarishlarni saqlash
@@ -232,5 +272,5 @@ const styles = StyleSheet.create({
   toastStyle: {
     zIndex: 1,
   },
-  usernameStyle: { fontSize: 20, textAlign: "center", marginVertical: 5 },
+  usernameStyle: { fontSize: 22, textAlign: "center", marginVertical: 5 },
 });

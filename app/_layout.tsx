@@ -6,6 +6,7 @@ import "react-native-reanimated";
 import * as React from "react";
 import { PaperProvider } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getToken } from "@/helpers/tokenHelper";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -18,19 +19,11 @@ export default function RootLayout() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const getToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("access_token");
-      return token;
-    } catch (error) {
-      console.error("Failed to fetch the token from storage", error);
-    }
-  };
-
   useEffect(() => {
     (async () => {
       try {
         const token = await getToken();
+
         if (token === null) {
           setAuthed(false);
           if (pathname !== "/login" && pathname !== "/register") {

@@ -1,4 +1,5 @@
 import Loader from "@/components/loader/Loader";
+import { getToken } from "@/helpers/tokenHelper";
 import { baseUrl } from "@/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
@@ -15,9 +16,21 @@ export default function AddScreen() {
   const [isPending, setIsPending] = useState(false);
 
   const handleSell = async () => {
+    if (!(shoeName && shoeColor && shoeSize && shoeSoldPrice && shoeGetPrice)) {
+      Toast.show({
+        type: "error",
+        text1: "Qiymat xatoligi",
+        text2: "Barcha qiymatlar to'dirilmagunicha poyabzal sota olmaysiz!",
+        position: "top",
+        topOffset: 10,
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+      return;
+    }
     setIsPending(true);
     try {
-      const access_token = await AsyncStorage.getItem("access_token");
+      const access_token = await getToken();
       const request = await fetch(`${baseUrl}/add-product`, {
         method: "POST",
         headers: {
@@ -97,7 +110,14 @@ export default function AddScreen() {
           label="Poyabzal nomi"
           value={shoeName}
           onChangeText={(text) => setShoeName(text)}
-          right={<TextInput.Affix text={`${shoeName.length}/20`} />}
+          right={
+            <TextInput.Affix
+              text={`${shoeName.length}/20`}
+              textStyle={{
+                color: shoeName.length > 20 ? "red" : "gray",
+              }}
+            />
+          }
         />
         <View style={styles.viewStyle}>
           <TextInput
@@ -108,7 +128,14 @@ export default function AddScreen() {
             label="O'lcham"
             value={shoeSize}
             onChangeText={(text) => setShoeSize(text)}
-            right={<TextInput.Affix />}
+            right={
+              <TextInput.Affix
+                text={`${shoeSize.length}/2`}
+                textStyle={{
+                  color: shoeSize.length > 2 ? "red" : "gray",
+                }}
+              />
+            }
           />
           <TextInput
             mode="outlined"
@@ -117,7 +144,14 @@ export default function AddScreen() {
             label="Rang"
             value={shoeColor}
             onChangeText={(text) => setShoeColor(text)}
-            right={<TextInput.Affix text={`${shoeColor.length}/20`} />}
+            right={
+              <TextInput.Affix
+                text={`${shoeColor.length}/20`}
+                textStyle={{
+                  color: shoeColor.length > 20 ? "red" : "gray",
+                }}
+              />
+            }
           />
         </View>
         <View style={styles.viewStyle}>
@@ -150,6 +184,11 @@ export default function AddScreen() {
           <Button
             style={styles.buttonStyle}
             mode="contained"
+            disabled={
+              shoeName.length > 20 ||
+              shoeSize.length > 2 ||
+              shoeColor.length > 20
+            }
             onPress={() => handleSell()}
           >
             Poyabzal sotish

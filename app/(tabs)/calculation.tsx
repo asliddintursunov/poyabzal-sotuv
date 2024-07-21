@@ -2,9 +2,10 @@ import { baseUrl } from "@/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
-import { Button } from "react-native-paper";
+import { Button, Appbar } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import Loader from "@/components/loader/Loader";
+import { getToken } from "@/helpers/tokenHelper";
 import {
   DatePickerInput,
   registerTranslation,
@@ -29,9 +30,7 @@ export default function CalculationScreen() {
 
   useEffect(() => {
     (async () => {
-      console.log("date =>", date);
-      
-      const access_token = await AsyncStorage.getItem("access_token");
+      const access_token = await getToken();
       const formatted_date = date.toLocaleDateString("en-US");
       if (!access_token) return;
 
@@ -93,7 +92,7 @@ export default function CalculationScreen() {
           value={date}
           onChange={(e: any) => setDate(e)}
           inputMode="start"
-          style={{ backgroundColor: "#009fff", marginTop: 85 }}
+          style={{ backgroundColor: "#81b2eb", marginTop: 85 }}
         />
         <View style={{ marginTop: 70, width: "96%", marginHorizontal: "auto" }}>
           <Text style={{ fontSize: 26 }}>
@@ -113,6 +112,11 @@ export default function CalculationScreen() {
                         {el.product_color} | {el.product_name} |{" "}
                         {el.product_size}
                       </Text>
+                      <Appbar.Action
+                        icon="square-edit-outline"
+                        iconColor="#4a79f0"
+                        style={{ backgroundColor: "#e6f0f5" }}
+                      />
                     </View>
                     <View style={styles.cardActions}>
                       <View style={styles.cardContent}>
@@ -168,8 +172,8 @@ const styles = StyleSheet.create({
   },
   cardHeading: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
     height: 40,
   },
@@ -194,5 +198,11 @@ const styles = StyleSheet.create({
   },
   toastStyle: {
     zIndex: 1,
+  },
+  cardButtonContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
