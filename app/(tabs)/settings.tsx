@@ -150,8 +150,10 @@ export default function SettingsScreen() {
 
   return (
     <>
-      {/* <Text style={styles.usernameStyle}>{initialData.username}</Text> */}
-      <Text style={styles.usernameStyle}>Foydalanuvchi ismi</Text>
+      <Text style={styles.usernameStyle}>
+        {initialData.username ? initialData.username : "Foydalanuvchi ismi"}
+      </Text>
+      {/* <Text style={styles.usernameStyle}>Foydalanuvchi ismi</Text> */}
       {isPending && <Loader />}
       <View style={styles.toastStyle}>
         <Toast />

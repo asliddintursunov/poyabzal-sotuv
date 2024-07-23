@@ -1,11 +1,10 @@
 import { useFonts } from "expo-font";
-import { Stack, usePathname, useRouter } from "expo-router";
+import { Slot, Stack, usePathname, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import * as React from "react";
 import { PaperProvider } from "react-native-paper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getToken } from "@/helpers/tokenHelper";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -27,12 +26,12 @@ export default function RootLayout() {
         if (token === null) {
           setAuthed(false);
           if (pathname !== "/login" && pathname !== "/register") {
-            router.push("/login");
+            router.replace("/login");
           }
         } else {
           setAuthed(true);
           if (pathname === "/login" || pathname === "/register") {
-            router.push("/");
+            router.replace("/");
           }
         }
       } catch (error) {
@@ -48,7 +47,7 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <Slot />
   }
 
   return (

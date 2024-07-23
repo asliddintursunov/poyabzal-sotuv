@@ -1,7 +1,7 @@
 import Loader from "@/components/loader/Loader";
 import { getToken } from "@/helpers/tokenHelper";
 import { baseUrl } from "@/utils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View, Dimensions } from "react-native";
 import { TextInput, Button } from "react-native-paper";
@@ -31,6 +31,10 @@ export default function AddScreen() {
     setIsPending(true);
     try {
       const access_token = await getToken();
+      if (!access_token) {
+        const router = useRouter();
+        router.push("/login");
+      }
       const request = await fetch(`${baseUrl}/add-product`, {
         method: "POST",
         headers: {
@@ -63,6 +67,7 @@ export default function AddScreen() {
 
       const response = await request.json();
       setIsPending(false);
+      cancleSell();
       Toast.show({
         type: "success",
         text1: response.message,

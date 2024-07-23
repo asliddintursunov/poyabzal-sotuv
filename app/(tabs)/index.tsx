@@ -34,6 +34,8 @@ export default function HomeScreen() {
   >([{ date: "month", foyda: 0, savdo: 0 }]);
 
   useEffect(() => {
+    console.log(pathname);
+    
     if (pathname == "/") {
       (async () => {
         const currentDate = new Date();
@@ -87,6 +89,9 @@ export default function HomeScreen() {
             request1.json(),
             request2.json(),
           ]);
+
+          console.log("response1.stats => ", response1.stats);
+          console.log("response2.sixMonthStats => ", response2.sixMonthStats);
 
           setCurrMonthStats(response1.stats);
           setLast6minthsStats(response2.sixMonthStats);

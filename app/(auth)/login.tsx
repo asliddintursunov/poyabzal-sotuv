@@ -3,7 +3,6 @@ import { View, StyleSheet, Dimensions } from "react-native";
 import Inputs from "@/components/inputs/authInput";
 import { Button } from "react-native-paper";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { baseUrl } from "@/utils";
 import Toast from "react-native-toast-message";
