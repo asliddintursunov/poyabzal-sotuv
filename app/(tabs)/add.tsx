@@ -1,3 +1,4 @@
+import ProductInputs from "@/components/inputs/ProductInputs";
 import Loader from "@/components/loader/Loader";
 import { getToken } from "@/helpers/tokenHelper";
 import { baseUrl } from "@/utils";
@@ -105,86 +106,19 @@ export default function AddScreen() {
         <Toast />
       </View>
       <View style={styles.main}>
-        <TextInput
-          mode="outlined"
-          textColor="#333"
-          style={{
-            ...styles.textInput,
-            width: Dimensions.get("screen").width - 12,
-          }}
-          label="Poyabzal nomi"
-          value={shoeName}
-          onChangeText={(text) => setShoeName(text)}
-          right={
-            <TextInput.Affix
-              text={`${shoeName.length}/20`}
-              textStyle={{
-                color: shoeName.length > 20 ? "red" : "gray",
-              }}
-            />
-          }
+        <ProductInputs
+          from="add"
+          shoeName={shoeName}
+          shoeColor={shoeColor}
+          shoeSize={shoeSize}
+          shoeSoldPrice={shoeSoldPrice}
+          shoeGetPrice={shoeGetPrice}
+          setShoeName={setShoeName}
+          setShoeColor={setShoeColor}
+          setShoeSize={setShoeSize}
+          setShoeSoldPrice={setShoeSoldPrice}
+          setShoeGetPrice={setShoeGetPrice}
         />
-        <View style={styles.viewStyle}>
-          <TextInput
-            keyboardType="numeric"
-            mode="outlined"
-            textColor="#333"
-            style={styles.textInput}
-            label="O'lcham"
-            value={shoeSize}
-            onChangeText={(text) => setShoeSize(text)}
-            right={
-              <TextInput.Affix
-                text={`${shoeSize.length}/2`}
-                textStyle={{
-                  color: shoeSize.length > 2 ? "red" : "gray",
-                }}
-              />
-            }
-          />
-          <TextInput
-            mode="outlined"
-            textColor="#333"
-            style={styles.textInput}
-            label="Rang"
-            value={shoeColor}
-            onChangeText={(text) => setShoeColor(text)}
-            right={
-              <TextInput.Affix
-                text={`${shoeColor.length}/20`}
-                textStyle={{
-                  color: shoeColor.length > 20 ? "red" : "gray",
-                }}
-              />
-            }
-          />
-        </View>
-        <View style={styles.viewStyle}>
-          <TextInput
-            keyboardType="numeric"
-            mode="outlined"
-            textColor="#333"
-            style={styles.textInput}
-            label="Sotilish narxi"
-            value={shoeSoldPrice.trim()}
-            onChangeText={(text) => setShoeSoldPrice(text)}
-            right={
-              <TextInput.Affix textStyle={{ color: "#333" }} text="so'm" />
-            }
-          />
-          <TextInput
-            keyboardType="numeric"
-            mode="outlined"
-            textColor="#333"
-            style={styles.textInput}
-            label="Chiqish narxi"
-            value={shoeGetPrice.trim()}
-            onChangeText={(text) => setShoeGetPrice(text)}
-            right={
-              <TextInput.Affix textStyle={{ color: "#333" }} text="so'm" />
-            }
-          />
-        </View>
         <View style={styles.buttonContainer}>
           <Button
             style={styles.buttonStyle}
@@ -223,12 +157,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get("screen").width / 2 - 12,
     backgroundColor: "#fff",
     color: "#000",
-  },
-  viewStyle: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
   },
   buttonContainer: {
     display: "flex",

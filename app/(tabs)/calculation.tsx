@@ -2,10 +2,11 @@ import { baseUrl } from "@/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
-import { Button, Appbar } from "react-native-paper";
+import { Button, Appbar, Dialog } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import { getToken } from "@/helpers/tokenHelper";
 import CalculationSkeleton from "@/components/skeletons/CalculationSkeleton";
+import EditCardDialog from "@/components/dialog/EditCardDialog";
 import {
   DatePickerInput,
   registerTranslation,
@@ -31,6 +32,11 @@ export default function CalculationScreen() {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [isPending, setIsPending] = useState(false);
   const [targetDate, setTargetDate] = useState<string>("");
+  const [editableProduct, setEditableProduct] = useState<
+    ProductType | undefined
+  >(undefined);
+
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
   const months: any = {
     "1": "yanvar",
@@ -49,7 +55,7 @@ export default function CalculationScreen() {
 
   useEffect(() => {
     if (pathname != "/calculation") return;
-    (async () => {
+    (async (): Promise<ProductType[] | null | undefined> => {
       const access_token = await getToken();
       if (!access_token) {
         router.push("/login");
@@ -106,8 +112,30 @@ export default function CalculationScreen() {
     })();
   }, [date, pathname]);
 
+  const handleEdit = async (
+    id: number | undefined,
+    editableProduct: ProductType | undefined
+  ): Promise<ProductType[] | null | undefined | void> => {
+    console.log("Send to backend update");
+    console.log("id =>", id);
+    console.log("editableProduct =>", editableProduct);
+  };
+
+  const handleDelete = (id: number): void => {
+    console.log("Send to backend delete");
+    console.log("id =>", id);
+  };
+
   return (
     <>
+      {dialogVisible && (
+        <EditCardDialog
+          dialogVisible={dialogVisible}
+          setDialogVisible={setDialogVisible}
+          editableProduct={editableProduct}
+          handleEdit={handleEdit}
+        />
+      )}
       <View style={styles.toastStyle}>
         <Toast />
       </View>
@@ -144,6 +172,10 @@ export default function CalculationScreen() {
                           icon="square-edit-outline"
                           iconColor="#4a79f0"
                           style={{ backgroundColor: "#e6f0f5" }}
+                          onPress={() => {
+                            setDialogVisible(true);
+                            setEditableProduct(el);
+                          }}
                         />
                       </View>
                       <View style={styles.cardActions}>
@@ -159,6 +191,7 @@ export default function CalculationScreen() {
                           mode="contained"
                           buttonColor="#cf3c5a"
                           textColor="#fff"
+                          onPress={() => handleDelete(el.product_id)}
                         >
                           O'chirish
                         </Button>
