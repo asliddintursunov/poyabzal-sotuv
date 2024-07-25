@@ -11,6 +11,7 @@ type ProductType = {
   product_sold_price: number;
   product_get_price: number;
   product_sold_time: string;
+  is_product_changed?: Boolean
 };
 
 type Props = {
@@ -84,7 +85,7 @@ const MyComponent = ({
               hideDialog();
             }}
           >
-            Cancel
+            Bekor qilish
           </Button>
           <Button
             disabled={
@@ -107,7 +108,7 @@ const MyComponent = ({
               handleEdit(shoeId, editableProduct);
             }}
           >
-            Ok
+            Saqlash
           </Button>
         </Dialog.Actions>
       </Dialog>

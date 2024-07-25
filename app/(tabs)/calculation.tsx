@@ -1,12 +1,12 @@
 import { baseUrl } from "@/utils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
-import { Button, Appbar, Dialog } from "react-native-paper";
+import { Button, Appbar } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import { getToken } from "@/helpers/tokenHelper";
 import CalculationSkeleton from "@/components/skeletons/CalculationSkeleton";
 import EditCardDialog from "@/components/dialog/EditCardDialog";
+import SeeDetailsDialog from "@/components/dialog/SeeDetailsDialog";
 import {
   DatePickerInput,
   registerTranslation,
@@ -23,6 +23,7 @@ type ProductType = {
   product_sold_price: number;
   product_get_price: number;
   product_sold_time: string;
+  is_product_changed?: Boolean;
 };
 
 export default function CalculationScreen() {
@@ -30,13 +31,18 @@ export default function CalculationScreen() {
   const pathname = usePathname();
   const [date, setDate] = useState(new Date());
   const [products, setProducts] = useState<ProductType[]>([]);
+  const [oldPorducts, setOldPorducts] = useState<ProductType[]>([]);
   const [isPending, setIsPending] = useState(false);
   const [targetDate, setTargetDate] = useState<string>("");
   const [editableProduct, setEditableProduct] = useState<
     ProductType | undefined
   >(undefined);
+  const [oneOldProductInfo, setOneOldProductInfo] = useState<
+    ProductType | undefined
+  >(undefined);
 
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+  const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
 
   const months: any = {
     "1": "yanvar",
@@ -54,6 +60,7 @@ export default function CalculationScreen() {
   };
 
   useEffect(() => {
+    setIsPending(true)
     if (pathname != "/calculation") return;
     (async (): Promise<ProductType[] | null | undefined> => {
       const access_token = await getToken();
@@ -95,7 +102,8 @@ export default function CalculationScreen() {
           return;
         }
         const response = await request.json();
-        setProducts(response.products);
+        setProducts(response.curr_products);
+        setOldPorducts(response.old_products);
         setIsPending(false);
       } catch (error) {
         setIsPending(false);
@@ -116,18 +124,144 @@ export default function CalculationScreen() {
     id: number | undefined,
     editableProduct: ProductType | undefined
   ): Promise<ProductType[] | null | undefined | void> => {
-    console.log("Send to backend update");
-    console.log("id =>", id);
-    console.log("editableProduct =>", editableProduct);
+    const access_token = await getToken();
+    if (!access_token) {
+      router.push("/login");
+    }
+
+    const product_data: any = {
+      product_id: id,
+      product_name: editableProduct?.product_name,
+      product_color: editableProduct?.product_color,
+      product_size: editableProduct?.product_size,
+      product_sold_price: editableProduct?.product_sold_price,
+      product_get_price: editableProduct?.product_get_price,
+    };
+
+    try {
+      const request = await fetch(`${baseUrl}/update-product`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product_data),
+      });
+
+      if (!request.ok) {
+        setIsPending(false);
+        Toast.show({
+          type: "error",
+          text1: "Poyabzalni almashtirish va yangilashda xatolik",
+          text2: "Qaytadan urunib ko'ring",
+          position: "top",
+          topOffset: 10,
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+        return;
+      }
+
+      const response = await request.json();
+      Toast.show({
+        type: "success",
+        text1: response.message,
+        position: "top",
+        topOffset: 10,
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+      setProducts((prev) =>
+        prev.map((p) => (p.product_id === id ? product_data : p))
+      );
+      setIsPending(false);
+    } catch (error) {
+      setIsPending(false);
+      Toast.show({
+        type: "error",
+        text1: "Poyabzalni almashtirish va yangilashda xatolik",
+        text2: "Qaytadan urunib ko'ring",
+        position: "top",
+        topOffset: 10,
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+    }
   };
 
-  const handleDelete = (id: number): void => {
-    console.log("Send to backend delete");
-    console.log("id =>", id);
+  const handleDelete = async (id: number) => {
+    const access_token = await getToken();
+    if (!access_token) {
+      router.push("/login");
+    }
+    try {
+      setIsPending(true);
+      const request = await fetch(`${baseUrl}/delete-product/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!request.ok) {
+        setIsPending(false);
+        Toast.show({
+          type: "error",
+          text1: "Poyabzalni o'chirishda xatolik",
+          text2: "Qaytadan urunib ko'ring",
+          position: "top",
+          topOffset: 10,
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+        return;
+      }
+
+      const response = await request.json();
+
+      Toast.show({
+        type: "success",
+        text1: response.message,
+        position: "top",
+        topOffset: 10,
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+      setProducts((prev) => prev.filter((e) => e.product_id !== id));
+      setIsPending(false);
+    } catch (error) {
+      setIsPending(false);
+      Toast.show({
+        type: "error",
+        text1: "Poyabzalni o'chirishda xatolik",
+        text2: "Qaytadan urunib ko'ring",
+        position: "top",
+        topOffset: 10,
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+    }
+  };
+
+  const handleOnePorductInfo = (product: ProductType) => {
+    const old_product = oldPorducts.find(
+      (p) => p.product_id === product.product_id
+    );
+    setOneOldProductInfo(old_product ?? undefined);
   };
 
   return (
     <>
+      {infoDialogVisible && (
+        <SeeDetailsDialog
+          infoDialogVisible={infoDialogVisible}
+          setInfoDialogVisible={setInfoDialogVisible}
+          productInfo={oneOldProductInfo}
+        />
+      )}
       {dialogVisible && (
         <EditCardDialog
           dialogVisible={dialogVisible}
@@ -168,15 +302,29 @@ export default function CalculationScreen() {
                           {el.product_color} | {el.product_name} |{" "}
                           {el.product_size}
                         </Text>
-                        <Appbar.Action
-                          icon="square-edit-outline"
-                          iconColor="#4a79f0"
-                          style={{ backgroundColor: "#e6f0f5" }}
-                          onPress={() => {
-                            setDialogVisible(true);
-                            setEditableProduct(el);
-                          }}
-                        />
+                        <View style={styles.iconContainer}>
+                          <Appbar.Action
+                            icon="square-edit-outline"
+                            iconColor="#4a79f0"
+                            style={{ backgroundColor: "#e6f0f5" }}
+                            onPress={() => {
+                              setDialogVisible(true);
+                              setEditableProduct(el);
+                              console.log(el);
+                            }}
+                          />
+                          {el.is_product_changed && (
+                            <Appbar.Action
+                              icon="information-outline"
+                              iconColor="#4a79f0"
+                              style={{ backgroundColor: "#e6f0f5" }}
+                              onPress={() => {
+                                setInfoDialogVisible(true);
+                                handleOnePorductInfo(el);
+                              }}
+                            />
+                          )}
+                        </View>
                       </View>
                       <View style={styles.cardActions}>
                         <View style={styles.cardContent}>
@@ -266,5 +414,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+  },
+  iconContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 4,
   },
 });
