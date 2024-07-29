@@ -25,7 +25,7 @@ export default function ProductInputs(props: Props) {
         style={{
           ...styles.textInput,
           width:
-            props.from == "edit" ? "90%" : Dimensions.get("screen").width - 12,
+            props.from == "edit" ? 302 : Dimensions.get("screen").width - 12,
           marginHorizontal: "auto",
         }}
         label="Poyabzal nomi"
@@ -49,7 +49,7 @@ export default function ProductInputs(props: Props) {
             ...styles.textInput,
             width:
               props.from == "edit"
-                ? 158
+                ? 148
                 : Dimensions.get("screen").width / 2 - 12,
             marginLeft: props.from == "edit" ? 18 : 0,
           }}
@@ -72,7 +72,7 @@ export default function ProductInputs(props: Props) {
             ...styles.textInput,
             width:
               props.from == "edit"
-                ? 158
+                ? 148
                 : Dimensions.get("screen").width / 2 - 12,
           }}
           label="Rang"
@@ -97,7 +97,7 @@ export default function ProductInputs(props: Props) {
             ...styles.textInput,
             width:
               props.from == "edit"
-                ? 158
+                ? 148
                 : Dimensions.get("screen").width / 2 - 12,
             marginLeft: props.from == "edit" ? 18 : 0,
           }}
@@ -114,7 +114,7 @@ export default function ProductInputs(props: Props) {
             ...styles.textInput,
             width:
               props.from == "edit"
-                ? 158
+                ? 148
                 : Dimensions.get("screen").width / 2 - 12,
           }}
           label="Chiqish narxi"

@@ -60,7 +60,7 @@ const MyComponent = ({
       <Dialog
         visible={dialogVisible}
         onDismiss={hideDialog}
-        style={{ borderRadius: 10 }}
+        style={{ borderRadius: 10, backgroundColor: "#eee" }}
       >
         <View style={{ paddingTop: 10, paddingBottom: 20 }}>
           <ProductInputs

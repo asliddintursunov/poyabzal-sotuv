@@ -27,7 +27,7 @@ export default function SeeDetailsDialog(params: Props) {
       <Dialog
         visible={params.infoDialogVisible}
         onDismiss={hideDialog}
-        style={{ borderRadius: 10 }}
+        style={{ borderRadius: 10, backgroundColor: "#eee" }}
       >
         <Card.Content>
           <Text
